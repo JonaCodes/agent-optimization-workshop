@@ -1,9 +1,10 @@
 ---
-description: >-
-  Use this skill when the user wants help finding a time, reviewing an existing meeting, scheduling an event, changing its details, or responding to an invitation. It applies to calendar selection, attendee lookup, date ranges, time zones, recurring meetings, and RSVP status. Resolve ambiguous attendees through the address book when needed, and keep event times tied to an explicit zone when local scheduling matters. Search and inspect existing events before creating or modifying them, and preserve recurrence scope when acting on one occurrence versus a full series.
+description: Use to find a meeting time, review or change a meeting, schedule it, or respond to an invitation.
 ---
 
 # Meeting planning
+
+Load `calendar` with `eve__skill` before using calendar tools. If attendee lookup is needed, load `contacts` before using contact tools.
 
 Resolve people with `contacts-search_people` when the attendee is identified by a name or organization and an address is needed. Use `contacts-get_person` to inspect a candidate when multiple records match. Include only attendees the user named or confirmed. Use `calendar-list_calendars` to identify the correct calendar and its access role.
 

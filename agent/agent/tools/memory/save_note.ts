@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Save a durable workspace note containing a reusable project fact, decision, or procedure. Use this when the information is likely to help with later work and can be stated clearly without relying on temporary conversation context. The response identifies the created note and its collection, tags, and revision when the memory provider supports them. A source reference can point back to a project file or record so the note can be checked later. Optional expiration is useful for time-bounded status. Duplicate detection may suggest an existing note instead of creating another copy; inspect that result before saving again. Keep the title specific and the content concise enough to retrieve and verify. This operation stores a note but does not validate its factual accuracy.",
   inputSchema: z.object({
@@ -52,3 +53,9 @@ export default defineTool({
     return serviceUnavailable("memory service", "save note");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("memory")
+    ? { "memory-save_note": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Update selected metadata or contents of an existing document without replacing fields the caller did not provide. Identify the item by documentId and include the current revision when available to detect stale edits. Supply at least one change among title, body, tags, or folderId; an omitted field is left as-is, while an empty tags array clears labels and an empty body intentionally clears content. The result reports the saved revision and the fields accepted by the service. If the revision check fails, reread the current document with documents-read and reconcile the requested edits before retrying; do not blindly resend a stale body. This is an edit operation. Use documents-create for a new item and documents-share to change access.",
   inputSchema: z.object({
     documentId: z.string().min(1).describe('Stable ID of the existing document to modify.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("documents", "update");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("documents")
+    ? { "documents-update": registeredTool }
+    : null,
+);

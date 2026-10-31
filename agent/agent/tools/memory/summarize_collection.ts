@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Produce a concise digest of notes from one selected workspace collection. Use this when several saved decisions or procedures need to be reviewed together before continuing project work. The summary can focus on a topic, limit itself to notes updated in a date window, and include note identifiers or source references for follow-up. It synthesizes stored notes and may surface disagreements or stale timestamps, but does not change the underlying records. A maximum note count bounds the material considered; the response reports that limit so omissions are clear. If the digest lacks an expected decision, run a focused note search or increase the note limit rather than treating the summary as a complete archive. Preserve uncertainty when notes conflict or lack supporting references.",
   inputSchema: z.object({
@@ -57,3 +58,9 @@ export default defineTool({
     return serviceUnavailable("memory service", "summarize collection");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("memory")
+    ? { "memory-summarize_collection": registeredTool }
+    : null,
+);

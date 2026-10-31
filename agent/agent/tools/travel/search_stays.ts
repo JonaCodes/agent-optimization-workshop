@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Find lodging options in a destination for a defined check-in and check-out period. Use this to compare available stays by location, nightly price, guest rating, and selected facilities. The response identifies the property, address or area, room offer, total quoted cost when available, included fees, cancellation terms, and the time the price was retrieved. Guest and room counts affect availability and should reflect the requested trip. Optional distance and amenity filters narrow the results; omit them when discovery is still broad. Prices may exclude local taxes or depend on a specific room being available, so preserve the provider’s stated price basis when summarizing. Search results do not reserve a room. If a destination has few matches, increase the radius or remove one amenity filter.",
   inputSchema: z.object({
@@ -60,3 +61,9 @@ export default defineTool({
     return serviceUnavailable("travel service", "search stays");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("travel")
+    ? { "travel-search_stays": registeredTool }
+    : null,
+);

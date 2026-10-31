@@ -1,13 +1,5 @@
 ---
-description: >-
-  Use for calendar lookup and coordination: finding availability, listing events,
-  creating or updating a meeting, canceling an event, or locating reasonable
-  overlap across timezones. Trigger when a request involves a connected calendar,
-  a specific event, a date range, attendee timing, or a recurring event scope.
-  Keep timestamps paired with their timezone and use exact event identifiers
-  when changing existing entries. For cross-region planning, distinguish
-  calculated overlap from actual calendar availability and use the appropriate
-  operation for each.
+description: Use for calendar agendas, availability, timezone overlap, meeting changes, or cancellations.
 ---
 
 # Scheduling

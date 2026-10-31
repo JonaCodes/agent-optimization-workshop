@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Read a bounded rectangular range from one spreadsheet tab. Identify the workbook and either its tab name or stable sheet ID, then provide an A1-style range such as A1:D20. Choose a value mode to receive calculated values, formulas, or both; formatted mode includes display strings where available. The response reports the resolved range, row and column dimensions, cell values, and whether service limits clipped the requested area. Keep reads focused because very large ranges may be truncated. When a result is clipped, request a smaller adjacent range rather than assuming missing cells are blank. This operation is read-only. Use spreadsheets-search to find a workbook and spreadsheets-write_range when the user asks to change cell contents.",
   inputSchema: z.object({
     spreadsheetId: z.string().min(1).describe('Stable ID of the workbook to inspect.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("spreadsheets", "read_range");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("spreadsheets")
+    ? { "spreadsheets-read_range": registeredTool }
+    : null,
+);

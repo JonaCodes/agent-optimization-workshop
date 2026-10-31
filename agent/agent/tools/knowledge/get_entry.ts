@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Retrieve the current or requested revision of one knowledge entry by stable ID. The response includes its title, type, body, tags, source label, revision, and linked entry IDs where available. Use includeLinks or includeHistory when the user asks about relationships or previous revisions; otherwise keep the response focused on the current record. If the entry ID is unknown, use knowledge-search rather than constructing one. This operation is read-only. Use knowledge-update_entry to revise a known entry, knowledge-link_entries to add a relationship, and knowledge-search to discover related material. If a selected revision is unavailable, retry with the current entry only when that answers the user's request, and state which version was read.",
   inputSchema: z.object({
     entryId: z.string().min(1).describe('Stable ID of the knowledge entry to retrieve.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("knowledge", "get_entry");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("knowledge")
+    ? { "knowledge-get_entry": registeredTool }
+    : null,
+);

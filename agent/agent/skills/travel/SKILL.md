@@ -1,13 +1,5 @@
 ---
-description: >-
-  Use when someone is searching for flights, lodging, or rail options, comparing
-  candidate itineraries, retrieving an existing reservation, or checking a
-  flight’s operational status. Trigger for trip-planning questions that depend
-  on current route availability, dates, fare details, property amenities, or
-  booking status in a connected travel service. Keep dates, local times, route,
-  traveler counts, currencies, and provider timestamps attached to results so
-  options remain comparable. Use this skill for exploration and lookup; searches
-  do not themselves reserve transport or a stay.
+description: Use to search or compare flights, lodging, or rail, inspect reservations, or track flights.
 ---
 
 # Travel
@@ -21,3 +13,5 @@ description: >-
 7. For a flight-day update, call `travel-track_flight` with the flight number and departure date. Include the feed’s update time when describing a delay, gate, or terminal.
 
 Separate quoted availability from confirmed booking details. When a result omits a fare rule, fee, or status timestamp, say it is not provided rather than inferring it.
+
+Searches and comparisons return options; they do not reserve flights or stays.

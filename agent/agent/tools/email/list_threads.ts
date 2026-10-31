@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "List conversations in a mailbox folder or label, returning one summary per thread rather than one row per message. Use this for an inbox overview, recent conversation scan, or when the user refers to a thread without knowing its subject. Each result includes a stable thread ID, latest-message timestamp, participant names, latest subject and snippet, message count, unread state, and relevant labels. Folder and label filters narrow the collection, while an optional unread filter supports triage. Results are sorted by most recently updated by default and constrained by page size; pass the returned cursor to fetch the next page. A thread summary is not a substitute for inspecting an individual message when exact wording or attachment details matter. This operation does not mark conversations read or alter folder membership.",
   inputSchema: z.object({
@@ -58,3 +59,9 @@ export default defineTool({
     return serviceUnavailable("email", "list_threads");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("email")
+    ? { "email-list_threads": registeredTool }
+    : null,
+);

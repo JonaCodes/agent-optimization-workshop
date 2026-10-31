@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Revise selected fields of an existing knowledge entry while preserving any field not included in the request. Identify the entry by stable ID and supply expectedRevision when available. Omitted title, type, body, tags, source label, or citations remain unchanged; an empty tag or citation array clears that collection where supported. The service returns the resulting revision and accepted fields. If an update is rejected because the entry changed, reread the current version with knowledge-get_entry and apply only the user's intended correction. This operation changes stored knowledge. Use knowledge-add_entry for a distinct new record, and use knowledge-link_entries to adjust relationships without rewriting the body. Keep revisions traceable by using a concise change note based on the user's request.",
   inputSchema: z.object({
     entryId: z.string().min(1).describe('Stable ID of the existing knowledge entry to edit.'),
@@ -19,3 +20,9 @@ export default defineTool({
     return serviceUnavailable("knowledge", "update_entry");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("knowledge")
+    ? { "knowledge-update_entry": registeredTool }
+    : null,
+);

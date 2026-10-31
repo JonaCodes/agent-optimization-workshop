@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Create a project record in the connected workspace. Supply a clear name and optionally a concise description, initial lifecycle status, owning group, labels, and parent scope. The result includes a stable project ID, normalized project metadata, and timestamps so later tools can inspect or update the record. Omitted status uses the workspace default, and omitted optional fields remain unset. This creates a new project; it does not merge with or replace an existing project of the same name. Search first when the user may mean an existing initiative. Keep the description factual and based on the user's input. Use projects-update to revise fields after creation and projects-set_status to record later lifecycle transitions.",
   inputSchema: z.object({
     name: z.string().min(1).max(180).describe('Project name supplied or approved by the user.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("projects", "create");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("projects")
+    ? { "projects-create": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create a new folder in the selected parent folder or at the provider's default root. The folder name is required; a parent ID is optional, and description, color, and initial labels can be supplied where supported. The response should return the new folder ID, normalized name, parent reference, and creation timestamp. Before creating a folder, inspect the parent when the user refers to an existing location or when name collisions would matter. Providers may permit duplicate names, so a matching name does not guarantee that a prior request succeeded. If a timeout leaves the result uncertain, list the parent folder and check for the newly created item before retrying. This operation creates an empty folder only; it does not move existing files or create a shared link.",
   inputSchema: z.object({
@@ -36,3 +37,9 @@ export default defineTool({
     return serviceUnavailable("files", "create_folder");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("files")
+    ? { "files-create_folder": registeredTool }
+    : null,
+);

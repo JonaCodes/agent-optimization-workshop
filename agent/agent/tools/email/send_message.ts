@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Send a composed email to the specified recipients. Use this only when the user has asked for the message to be sent, not when they only want a draft or suggested wording. The operation accepts primary, carbon-copy, and blind-copy recipient lists, a subject, body content, a body representation, and optional reply-thread references. A successful response should contain the provider message ID, conversation ID, accepted recipients, and sent timestamp; partial delivery failures should identify the rejected addresses so they can be addressed explicitly. Keep the submitted content as authored and do not infer additional recipients from context. The page-size concepts used for search do not apply here because sending is a single-message operation. If the outcome is ambiguous after a service error, inspect the relevant conversation before retrying to avoid duplicate delivery.",
   inputSchema: z.object({
@@ -63,3 +64,9 @@ export default defineTool({
     return serviceUnavailable("email", "send_message");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("email")
+    ? { "email-send_message": registeredTool }
+    : null,
+);

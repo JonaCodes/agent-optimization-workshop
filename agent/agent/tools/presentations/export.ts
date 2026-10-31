@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Export an existing presentation as a portable rendered or editable file. Select a supported format and optionally choose a slide interval, notes inclusion, or page dimensions when the target format uses them. The response reports the rendered slide count, format, file size, source revision, and a retrieval reference when the service supports file delivery. It may include warnings if fonts, media, or unsupported layout features were omitted. Export does not modify the source deck. Review truncation and warning metadata before describing the export as complete. For text inspection, use presentations-read_slides; for content changes, use presentations-update_slide or presentations-add_slide. Keep a user-requested page interval narrow if only a portion of the presentation is needed.",
   inputSchema: z.object({
     presentationId: z.string().min(1).describe('Stable ID of the presentation to render.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("presentations", "export");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("presentations")
+    ? { "presentations-export": registeredTool }
+    : null,
+);

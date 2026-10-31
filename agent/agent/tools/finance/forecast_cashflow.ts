@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Estimate account cash flow over a future horizon from available balances and scheduled recurring activity. Use this for a planning view of expected inflows, outflows, and projected balance, not as a guarantee of funds or investment advice. The forecast can include selected accounts and known recurring transactions; uncertain items may be marked as estimates with their source. The response provides a dated series in each account currency and summarizes the lowest projected balance. A scenario adjustment can model a one-time inflow or expense without changing the connected records. Longer horizons typically have more uncertainty, which should be stated when presenting results. If the provider lacks recurring-item data, retry with the balance-only option and describe the limited basis of the forecast.",
   inputSchema: z.object({
@@ -60,3 +61,9 @@ export default defineTool({
     return serviceUnavailable("finance service", "forecast cash flow");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("finance")
+    ? { "finance-forecast_cashflow": registeredTool }
+    : null,
+);

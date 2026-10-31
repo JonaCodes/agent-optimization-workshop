@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Change slide order in a presentation while keeping each slide's content intact. Provide the stable deck ID and an ordered list of one-based slide numbers describing the desired sequence. Use a complete permutation when the service requires the full deck; include all current slides exactly once and check slide count with presentations-read_slides or search metadata first. An optional expected revision lets the service reject ordering based on a deck that has changed since inspection. The result returns the new sequence, revision, and any validation error details. If the list is rejected, reread current slide positions and prepare a corrected full ordering rather than guessing. This operation changes the deck order only. Use presentations-update_slide to edit content and presentations-add_slide to insert a new slide.",
   inputSchema: z.object({
     presentationId: z.string().min(1).describe('Stable ID of the deck whose sequence should change.'),
@@ -16,3 +17,9 @@ export default defineTool({
     return serviceUnavailable("presentations", "reorder_slides");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("presentations")
+    ? { "presentations-reorder_slides": registeredTool }
+    : null,
+);

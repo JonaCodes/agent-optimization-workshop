@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create a calendar event with a title, time range, and optional attendees or location. Use this when the requested meeting details are settled and the target calendar is known. Start and end should be timezone-aware timestamps or local times accompanied by an IANA timezone; the provider’s response identifies the created event and normalized time range. Attendee invitations may be sent by the calendar provider as part of event creation, so include only intended invitees. Recurrence is expressed as a provider-compatible rule and may be rejected if unsupported. A successful response should contain the event identifier and status; if the provider reports a conflict, check availability and retry with a revised time rather than duplicating the same event.",
   inputSchema: z.object({
@@ -44,3 +45,9 @@ export default defineTool({
     return serviceUnavailable("scheduling service", "create event");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("scheduling")
+    ? { "scheduling-create_event": registeredTool }
+    : null,
+);

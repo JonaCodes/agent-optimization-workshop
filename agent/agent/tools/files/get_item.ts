@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Retrieve metadata and optional content for one file or folder by its stable item ID. The response can include the item's name, MIME type, size, parent folders, owner, editors, modified timestamp, description, labels, and share link. Content retrieval is separately controlled: request a text or metadata-only view for supported document types, or omit content to inspect metadata alone. Binary file bytes are not returned through this tool. A maximum character limit bounds textual content and the response indicates truncation when needed. If the ID no longer resolves or the account lacks access, search by filename or parent folder to locate a current accessible item. This is a read operation; it does not change permissions, move the item, or update its modified timestamp.",
   inputSchema: z.object({
@@ -49,3 +50,9 @@ export default defineTool({
     return serviceUnavailable("files", "get_item");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("files")
+    ? { "files-get_item": registeredTool }
+    : null,
+);

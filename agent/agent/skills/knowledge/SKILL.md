@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill when the user asks to find, inspect, add, correct, connect, archive, or restore a reusable knowledge entry. Triggers include looking up a definition, process, decision, reference, or FAQ; preserving supplied material; correcting an entry; connecting two known records; or removing an item from ordinary search while retaining it. Route discovery to knowledge-search and full record inspection to knowledge-get_entry. Use knowledge-add_entry only for requested new material, knowledge-update_entry for corrections, knowledge-link_entries for explicit relationships, and knowledge-archive_entry for archive or restore requests. This skill manages knowledge records, not general document editing, sheet or slide content, project creation, or outside research.
+description: Use to find, inspect, add, correct, link, archive, or restore reusable knowledge entries.
 ---
 
 ## Procedure
@@ -12,5 +11,7 @@ description: >-
 5. Use knowledge-archive_entry to archive or restore a confirmed entry. Preserve content and links unless the user asks for another change.
 
 Do not invent citations, source labels, entry content, or relationships. If a tool reports service unavailability, state that the operation did not complete.
+
+Use this skill for knowledge records, not document, spreadsheet, slide, or project edits or outside research.
 
 When revision history matters, compare the requested revision with the current record before summarizing a change. If a relationship is central to the answer, inspect both entries and describe only the saved relationship label.

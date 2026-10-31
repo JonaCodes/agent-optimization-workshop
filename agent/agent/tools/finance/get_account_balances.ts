@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Read current and available balances for one or more connected financial accounts. Use this for a point-in-time balance check, not for transaction history or a projected cash position. Account selection can be narrowed by identifier, institution, or account type; omit selectors to return the accounts visible to the connected service. The result reports each account’s display label, currency, current balance, available balance when supplied, and the provider’s as-of timestamp. Balances from different currencies remain separate and should not be added unless an explicit conversion is requested elsewhere. A provider may omit available balance for some account types. If the returned timestamp is stale or an account is missing, repeat with the account identifier and report that the connection may need refreshing.",
   inputSchema: z.object({
@@ -39,3 +40,9 @@ export default defineTool({
     return serviceUnavailable("finance service", "get account balances");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("finance")
+    ? { "finance-get_account_balances": registeredTool }
+    : null,
+);

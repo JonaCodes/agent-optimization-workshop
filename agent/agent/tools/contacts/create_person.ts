@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create a new address-book contact from the supplied name and any known contact details. A contact can be created with only a partial name, while email addresses, phone numbers, organization, job title, group IDs, and notes are optional. Collections accept typed values so a person can have separate work and personal details without flattening them into one string. The response should contain the new stable person ID, normalized display name, accepted fields, and any provider warnings about duplicate candidates. Before creating, search for an existing record when the user indicates the person may already be in the address book. This action writes a contact and may become visible to synced devices; do not add inferred details. If the provider identifies a duplicate, inspect it rather than repeating the create request.",
   inputSchema: z.object({
@@ -62,3 +63,9 @@ export default defineTool({
     return serviceUnavailable("contacts", "create_person");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("contacts")
+    ? { "contacts-create_person": registeredTool }
+    : null,
+);

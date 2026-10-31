@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create an editable draft message without sending it. Use this when the user asks to prepare or save correspondence for later review, or when a composed reply should remain unsent. Recipients may be supplied as addresses or display-name and address pairs; CC and BCC are optional, and subject and body can be left incomplete for a working draft. A reply can be associated with an existing message or thread so the draft inherits conversation context and provider threading metadata. The result identifies the created draft and reports its normalized recipient list and current save state. The body format indicates whether supplied content is plain text or HTML; plain text is the default and safer for ordinary prose. If the service rejects an address or required content, correct the indicated input and create a new draft only after resolving whether the first request succeeded.",
   inputSchema: z.object({
@@ -51,3 +52,9 @@ export default defineTool({
     return serviceUnavailable("email", "create_draft");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("email")
+    ? { "email-create_draft": registeredTool }
+    : null,
+);

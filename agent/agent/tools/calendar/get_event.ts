@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Retrieve the full details for one calendar event using its event identifier and, when needed by the provider, its calendar identifier. The response includes title, description, start and end timestamps, time zone, location, organizer, attendee addresses and response states, recurrence information, conferencing details, and current visibility. Optional sections let callers omit lengthy attendee lists or private notes when they are not needed. For a recurring series, use the occurrence identifier returned by search when asking about one date; a series identifier may otherwise return the recurrence definition. If the event is missing or inaccessible, perform a fresh search on the relevant calendar and interval. This read operation does not RSVP, edit event details, or expose attachment contents.",
   inputSchema: z.object({
@@ -48,3 +49,9 @@ export default defineTool({
     return serviceUnavailable("calendar", "get_event");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("calendar")
+    ? { "calendar-get_event": registeredTool }
+    : null,
+);

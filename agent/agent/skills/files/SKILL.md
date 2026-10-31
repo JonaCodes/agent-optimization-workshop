@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill to locate, inspect, list, create, move, or share files and folders available to the connected account. It applies to filename or content searches, folder inventories, item metadata, textual document inspection, creating folders, changing locations, and granting access. Choose search for broad discovery and folder listing for direct children; use current item IDs for follow-up operations. Review parent and permission context when location or access changes may affect other people.
+description: Use to search, inspect, list, create, move, or share files and folders in the connected account.
 ---
 
 # File operations

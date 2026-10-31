@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Retrieve the detailed address-book record for a person using a stable person ID, usually obtained from contacts-search_people. The response can include names, email and phone collections, organization and role, addresses, dates, tags, group memberships, notes, and the provider's field metadata. Select individual field groups to keep the result focused; when omitted, the service returns its normal contact detail set. Some directories restrict notes or private fields, and unavailable groups may be omitted rather than returned as empty values. If the ID is stale, search again using the person's current email or name and inspect the candidate before updating. This operation is read-only; it does not add the person to recent contacts, share the record, or reveal credentials or authentication details.",
   inputSchema: z.object({
@@ -52,3 +53,9 @@ export default defineTool({
     return serviceUnavailable("contacts", "get_person");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("contacts")
+    ? { "contacts-get_person": registeredTool }
+    : null,
+);

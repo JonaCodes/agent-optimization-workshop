@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Add a knowledge entry from material the user supplied or explicitly asked to preserve. Provide a concise title, a supported entry type, and body text; optionally attach topic tags, a source label, and citations or related entry IDs. The result reports the new stable ID, revision, normalized metadata, and any unresolved related IDs. Omitted source information remains unset rather than being invented. This operation creates a new entry and does not replace an existing one with a similar title; search first if the user may mean an existing record. Keep the body faithful to source material and distinguish quoted facts from interpretation. Use knowledge-update_entry for later corrections and knowledge-link_entries to establish relationships after confirming the target IDs.",
   inputSchema: z.object({
     title: z.string().min(1).max(240).describe('Short knowledge-entry title supplied or approved by the user.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("knowledge", "add_entry");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("knowledge")
+    ? { "knowledge-add_entry": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search available flight itineraries between two places for a specified departure date or date range. Use this when the user is exploring air travel options and has provided enough route and timing detail to search. The result contains itinerary segments, local departure and arrival times, duration, stops, airline, fare conditions when supplied, and a quoted price with currency and retrieval time. A round trip can be requested with a return date, while one-way searches omit it. Nearby airports and flexible dates broaden results; specify these deliberately because they can change the route substantially. Results are ranked by the requested preference and limited to a bounded page. Search data can change quickly and is not a booking confirmation. If no matches appear, widen the date range or allow additional stops.",
   inputSchema: z.object({
@@ -77,3 +78,9 @@ export default defineTool({
     return serviceUnavailable("travel service", "search flights");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("travel")
+    ? { "travel-search_flights": registeredTool }
+    : null,
+);

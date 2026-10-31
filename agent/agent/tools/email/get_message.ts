@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Retrieve one message by its provider message identifier, typically after locating it with email-search_messages or following a thread reference. The response includes the message's stable ID, conversation ID, sender and recipient headers, sent and received timestamps, subject, labels, and selected body representation. Choose a body format to request plain text, HTML, or a normalized text rendering; large bodies may be truncated according to the maximum character limit and carry a truncation indicator. Attachment metadata can be included without downloading file contents, and headers can be requested for delivery details. If an identifier is stale or belongs to another account, the service should report that the message could not be found; use a fresh search rather than guessing an ID. This is a read operation and leaves mailbox state unchanged.",
   inputSchema: z.object({
@@ -47,3 +48,9 @@ export default defineTool({
     return serviceUnavailable("email", "get_message");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("email")
+    ? { "email-get_message": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Find calendar events by words in their title or description, organizer or attendee, calendar, and a time interval. Use this to identify an event before retrieving details or making a change. Results include event and calendar identifiers, title, start and end values with time zones, organizer, response status, and a short location summary. The interval uses an inclusive start and exclusive end; specify a time zone when the user's dates are local or ambiguous. Search can include recurring instances, with each occurrence represented separately when requested. Results are bounded by page size and may include a continuation token; follow it to complete the interval before concluding no event matches. Search is read-only and does not alter attendees or event state.",
   inputSchema: z.object({
@@ -62,3 +63,9 @@ export default defineTool({
     return serviceUnavailable("calendar", "search_events");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("calendar")
+    ? { "calendar-search_events": registeredTool }
+    : null,
+);

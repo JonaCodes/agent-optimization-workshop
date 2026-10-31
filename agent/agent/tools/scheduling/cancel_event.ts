@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Cancel an existing calendar event or a selected occurrence in a recurring series. Use this only when the exact event identifier and cancellation scope are known. The provider may notify attendees and return a cancellation status with the affected event reference. A cancellation reason is optional and appears in the event update when supported. Recurring events require an explicit scope because canceling one occurrence differs from canceling the whole series. This operation removes or marks the event canceled; it does not automatically create a replacement event. If the provider cannot find the identifier, list events again for the original time window and confirm the matching event before retrying.",
   inputSchema: z.object({
@@ -31,3 +32,9 @@ export default defineTool({
     return serviceUnavailable("scheduling service", "cancel event");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("scheduling")
+    ? { "scheduling-cancel_event": registeredTool }
+    : null,
+);

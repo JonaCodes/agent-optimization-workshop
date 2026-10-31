@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Estimate the size and summary attributes of an audience defined by behavioral or profile conditions. Use this to inspect a cohort before comparing it with another population or building a report. Conditions are evaluated against the selected lookback window; event conditions refer to observed activity and profile conditions refer to the latest available user properties. The response provides an approximate user count, the evaluation window, and only the requested aggregate summaries, not individual-level records. Sampling may apply for very large cohorts, and the result identifies when an estimate is sampled. Add a stable cohort name only when the provider supports a saved reusable segment; otherwise omit it. If the audience is unexpectedly empty, broaden the date window or remove a restrictive condition and rerun.",
   inputSchema: z.object({
@@ -77,3 +78,9 @@ export default defineTool({
     return serviceUnavailable("analytics service", "segment audience");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("analytics")
+    ? { "analytics-segment_audience": registeredTool }
+    : null,
+);

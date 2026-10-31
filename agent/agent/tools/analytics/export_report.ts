@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Request a formatted export of an existing analytics report by its report identifier. Use this after a report has been selected and the user needs a file-oriented representation for review or sharing. The export preserves the report’s saved metric definitions and filters, with optional date overrides when the provider permits them. Choose CSV for row-based analysis, JSON for structured processing, or PDF for a fixed-layout snapshot. Large reports may be prepared asynchronously; the response then returns a job reference and status rather than file contents, which can be used to check or retrieve the export later. The tool does not create or alter the source report. If the requested format or date override is unsupported, retry with the report’s saved settings and a supported format.",
   inputSchema: z.object({
@@ -48,3 +49,9 @@ export default defineTool({
     return serviceUnavailable("analytics service", "export report");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("analytics")
+    ? { "analytics-export_report": registeredTool }
+    : null,
+);

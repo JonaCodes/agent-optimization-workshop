@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Create a document in the connected workspace from text supplied by the user. Provide a title and initial body, choose an explicit content format, and optionally place it in a known folder with labels. The service returns the new document ID, saved title, revision, normalized format, and destination metadata so later edits or reads can use the stable ID. Empty or omitted tags do not add labels, and omitted folderId uses the workspace default location. This operation creates a new item and does not replace a similarly named document; check with documents-search first if the user may mean an existing file. Keep source text intact unless the user requested edits, and use documents-update for later changes to the created item.",
   inputSchema: z.object({
     title: z.string().min(1).max(240).describe('Human-readable document title; keep it concise and preserve wording provided by the user.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("documents", "create");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("documents")
+    ? { "documents-create": registeredTool }
+    : null,
+);

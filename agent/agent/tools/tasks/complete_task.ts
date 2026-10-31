@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Mark a task as completed, optionally recording a completion date or a short completion note. Use this focused operation when the user reports that a specific task is finished; use tasks-update_task for other task edits. The result should identify the task, final status, and completion timestamp. If the task ID is not certain, search first and inspect the candidate before marking it complete. An already completed task should be reported as such rather than treated as a failure. Providers may close open checklist items automatically or leave them unchanged; the response should expose any such behavior. Completion changes the task record and can trigger project notifications, so only call it when the user requests completion or clearly states the task is done.",
   inputSchema: z.object({
@@ -38,3 +39,9 @@ export default defineTool({
     return serviceUnavailable("tasks", "complete_task");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("tasks")
+    ? { "tasks-complete_task": registeredTool }
+    : null,
+);

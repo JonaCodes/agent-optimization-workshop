@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Check the latest operational status for a specific flight on a travel date. Use this for departure, arrival, gate, terminal, or delay updates after a flight has been identified. The response includes the flight number, route, scheduled and estimated local times, current status, and the provider’s last-updated timestamp when available. Flight number alone can refer to multiple dates or routes, so provide the date and optionally the departure airport to disambiguate. Status feeds may lag during operational disruptions; the returned timestamp should accompany time-sensitive summaries. This lookup does not change a booking or contact the airline. If the flight cannot be matched, verify the number and date from the reservation and retry with the origin airport.",
   inputSchema: z.object({
@@ -38,3 +39,9 @@ export default defineTool({
     return serviceUnavailable("travel service", "track flight");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("travel")
+    ? { "travel-track_flight": registeredTool }
+    : null,
+);

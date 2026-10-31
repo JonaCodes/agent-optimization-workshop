@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "List projects or task lists the connected account can access, with optional filters for name, owner, and archived state. Use this to find a destination before creating or moving a task, or to understand which work areas are available. Results include stable project IDs, names, descriptions, owner, status, and optionally task counts and member summaries. Project names are not guaranteed to be unique, so use the ID in subsequent task operations. The list is paginated and returns a continuation cursor for larger workspaces; follow it to review the full set. This operation is read-only and does not create, archive, or reorder projects. If an expected project is missing, broaden the filter or include archived projects before concluding that it is inaccessible.",
   inputSchema: z.object({
@@ -52,3 +53,9 @@ export default defineTool({
     return serviceUnavailable("tasks", "list_projects");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("tasks")
+    ? { "tasks-list_projects": registeredTool }
+    : null,
+);

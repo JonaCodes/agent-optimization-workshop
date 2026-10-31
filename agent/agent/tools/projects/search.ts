@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Find projects in the connected workspace using text and optional status, owner-group, label, or date filters. Query terms match project names and indexed descriptions; add filters only when the user specifies a boundary or needs fewer results. Archived projects are omitted by default. Each result page contains stable project IDs, names, current status, labels, and last-updated metadata. Use limit to control page size and pass nextCursor unchanged to continue; omit cursor to restart. Search is read-only and does not create or update projects. Use projects-get to inspect the full record and projects-list_activity for a focused timeline. If the user requests a new project, use projects-create after collecting a meaningful name and any required scope; if they request a state change, use projects-set_status.",
   inputSchema: z.object({
     query: z.string().min(1).describe('Project name or descriptive phrase to match.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("projects", "search");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("projects")
+    ? { "projects-search": registeredTool }
+    : null,
+);

@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill to find, inspect, create, update, or complete tasks and to identify projects or task lists. It applies to task titles, descriptions, statuses, due dates, priorities, assignees, labels, checklists, and project destinations. Search for an existing task before creating when the user may be referring to prior work. Use current task and project IDs for changes, and inspect existing collection values before replacing labels or checklist items. Continue paginated searches or project listings when the user requests a complete set.
+description: Use to find, inspect, create, update, or complete tasks and resolve their project destinations.
 ---
 
 # Task operations

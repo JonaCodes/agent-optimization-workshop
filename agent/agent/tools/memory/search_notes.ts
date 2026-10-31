@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Find previously saved workspace notes using a natural-language phrase or exact text. Use this when earlier project decisions, reusable procedures, or recorded technical context may answer a question. Search can be scoped to a collection, filtered by tags or update date, and run as semantic or literal matching when the provider supports both. Results contain note identifiers, titles, concise excerpts, matching metadata, and source references where available; request the full note only when the excerpt is insufficient. Relevance ranking is approximate, so do not treat the first result as authoritative when multiple notes conflict. Results are paginated with an opaque cursor and bounded page size. If the search is too broad, add a distinctive term or collection filter and start a fresh page.",
   inputSchema: z.object({
@@ -49,3 +50,9 @@ export default defineTool({
     return serviceUnavailable("memory service", "search notes");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("memory")
+    ? { "memory-search_notes": registeredTool }
+    : null,
+);

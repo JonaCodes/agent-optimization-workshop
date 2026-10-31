@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill when the user wants to locate a workbook, inspect a specific tab or cell range, create a spreadsheet, change values or formulas, adjust cell presentation, or export a workbook. Triggers include questions about cells, formulas, tab contents, data layout, number formats, or workbook files. Route discovery to spreadsheets-search, bounded inspection to spreadsheets-read_range, content edits to spreadsheets-write_range, creation to spreadsheets-create, display styling to spreadsheets-format_range, and rendered or editable output to spreadsheets-export. Keep cell reads and writes scoped to the requested range. This skill handles workbook tabs and ranges; route prose documents, presentation slides, project lifecycle, or reusable knowledge records to their matching skills.
+description: Use to find, inspect, create, edit, format, or export workbooks and cell ranges.
 ---
 
 ## Procedure

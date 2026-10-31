@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create a calendar event on the selected calendar. A concise title and start and end values are required; use ISO 8601 timestamps with explicit offsets or date-only values for all-day events. The operation supports a location, description, invited attendees, recurrence, and an optional video meeting request. The response should return the new event and calendar identifiers, normalized times, conference details if created, and delivery status for invitations. Attendee addresses are passed as supplied and should not be inferred beyond the user's request. If the service rejects the time range or recurrence syntax, correct those fields before retrying. Event creation immediately changes the calendar and may send invitations, so use this operation only when the user asks to schedule the event; use search or draft planning for exploratory requests.",
   inputSchema: z.object({
@@ -75,3 +76,9 @@ export default defineTool({
     return serviceUnavailable("calendar", "create_event");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("calendar")
+    ? { "calendar-create_event": registeredTool }
+    : null,
+);

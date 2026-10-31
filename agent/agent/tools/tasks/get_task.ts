@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Retrieve a task by its stable task ID, usually obtained from tasks-search_tasks or a project view. The response includes title, full description, status, priority, due date, assignee, project, labels, checklist items, links, and timestamps. Optional sections can include comments or activity history when the user needs context about how the task changed. A task ID from another workspace or a deleted item may not be accessible; search by title or project and verify the candidate before making changes. Details are returned in a bounded response, with long descriptions or activity histories subject to service limits. This is a read operation; it does not subscribe the user, change status, or update project recency.",
   inputSchema: z.object({
@@ -45,3 +46,9 @@ export default defineTool({
     return serviceUnavailable("tasks", "get_task");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("tasks")
+    ? { "tasks-get_task": registeredTool }
+    : null,
+);

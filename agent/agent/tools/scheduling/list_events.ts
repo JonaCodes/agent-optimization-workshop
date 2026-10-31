@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "List calendar events within a date range from selected connected calendars. Use this to review an agenda, locate an event, or gather context before rescheduling. Each result includes the event identifier, title, start and end times, timezone, calendar label, and attendance status when supplied by the provider. The time window is interpreted in the requested timezone; omit it only when the provider supports a bounded default view. Optional text and attendee filters narrow the results before pagination. Recurring events may appear as individual occurrences or as a series, depending on provider behavior, so check the returned event identifiers before modifying an item. Results are capped per page and continue with an opaque cursor. If an event is absent, widen the time window or include additional calendars.",
   inputSchema: z.object({
@@ -51,3 +52,9 @@ export default defineTool({
     return serviceUnavailable("scheduling service", "list events");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("scheduling")
+    ? { "scheduling-list_events": registeredTool }
+    : null,
+);

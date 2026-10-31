@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Read a chronological page of recorded activity for one project. Use a stable project ID and optionally restrict the event types or time interval to answer a focused question. The response includes event identifiers, timestamps, event categories, brief summaries, and actor group labels when available. It does not return personal contact details or full contents of linked resources. Use limit and cursor for bounded pagination; pass nextCursor unchanged to continue, and stop when no cursor is returned. Activity is read-only. Use projects-get for the current project state and the document, spreadsheet, or presentation tools for linked resource content. If an event summary is ambiguous, inspect the relevant resource by its stable ID rather than inferring details from the event label.",
   inputSchema: z.object({
     projectId: z.string().min(1).describe('Stable ID of the project whose activity should be listed.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("projects", "list_activity");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("projects")
+    ? { "projects-list_activity": registeredTool }
+    : null,
+);

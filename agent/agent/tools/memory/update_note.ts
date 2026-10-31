@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Revise selected fields on an existing workspace note identified by its stable note identifier. Use this when a saved project fact or procedure has changed and the existing record should remain the canonical reference. Only provided optional fields are replaced; omitted fields remain as they are. The response identifies the revised note and its new revision or update timestamp when available. An expected revision can prevent overwriting a newer edit made after the note was read. A source reference should be updated alongside content when its supporting file or record changes. If the provider reports a revision conflict, retrieve the current note, reconcile the differences, and retry with the latest revision rather than forcing an old version over newer work.",
   inputSchema: z.object({
@@ -54,3 +55,9 @@ export default defineTool({
     return serviceUnavailable("memory service", "update note");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("memory")
+    ? { "memory-update_note": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search train and intercity rail departures between two stations or cities on a travel date. Use this for rail alternatives, including direct and connecting services where the provider supports them. Results show operator, departure and arrival station, local times, journey duration, transfers, seat class, and an available fare with currency. Station names are resolved by the provider, so include a city or station qualifier when a name is ambiguous. An optional time window filters by local departure time; ranking can favor the earliest, fastest, or lowest-priced result. Fare availability may be limited and ticket rules can vary by operator. This search does not purchase a ticket. If the route returns no options, try nearby stations or a less restrictive time window.",
   inputSchema: z.object({
@@ -48,3 +49,9 @@ export default defineTool({
     return serviceUnavailable("travel service", "search rail");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("travel")
+    ? { "travel-search_rail": registeredTool }
+    : null,
+);

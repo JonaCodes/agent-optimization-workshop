@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Find spreadsheets by title, text, location, labels, or modification time. A concise query matches names and indexed cell content; add a folder or label only when the user needs a narrower result set. Archived sheets stay out of results unless explicitly included. Each page returns stable spreadsheet IDs, titles, locations, update metadata, and a compact summary such as sheet count or matched text preview. Use the nextCursor exactly as returned to continue and keep limit within the allowed range; omit cursor for the first page. Search never reads an entire grid or changes cell values. Once an ID is selected, use spreadsheets-read_range to inspect specific cells, or spreadsheets-export for a file representation. Prefer narrow cell ranges over exporting a large workbook when only a few values are needed.",
   inputSchema: z.object({
     query: z.string().min(1).describe('Words or a phrase to match in spreadsheet titles and indexed cell content.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("spreadsheets", "search");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("spreadsheets")
+    ? { "spreadsheets-search": registeredTool }
+    : null,
+);

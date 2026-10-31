@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill when the user asks to locate a deck, inspect selected slides, add or revise slide content, reorder slides, or export a presentation. Triggers include requests to read slide text, review speaker notes, create a new slide in an existing deck, change a heading or layout, move slides, or render a PDF, PPTX, image set, or HTML copy. Route discovery to presentations-search and slide inspection to presentations-read_slides. Use presentations-add_slide for a new slide, presentations-update_slide for requested edits, presentations-reorder_slides for sequence changes, and presentations-export for output files. Keep selections bounded by slide number. This skill does not create new presentation files; it edits or exports a known deck only.
+description: Use to find a deck, inspect or edit slides, reorder slides, or export a presentation.
 ---
 
 ## Procedure
@@ -15,3 +14,5 @@ description: >-
 Preserve user wording and supplied source material. These tools may return service unavailability; do not claim that content changes or exports completed unless a success result confirms them.
 
 When the request is only for an export, do not add or revise slides as part of rendering. State the selected slide interval so the user can distinguish a partial export from a whole-deck copy.
+
+This skill edits or exports known decks; it does not create presentation files.

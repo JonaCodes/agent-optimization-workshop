@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill when the user asks to find, inspect, create, revise, share, or export workspace documents. Triggers include locating a policy or note, reading a particular section or revision, drafting a document from supplied text, changing an existing file, adjusting its access audience, or preparing a PDF, Word, Markdown, HTML, or plain-text copy. Route collection discovery to documents-search, source inspection to documents-read, new items to documents-create, and requested edits to documents-update. Use documents-share only for explicit access changes and documents-export for rendered copies. This skill covers document records and their text, not spreadsheet cells, slide content, project status, or general knowledge entries.
+description: Use to find, read, create, revise, share, or export workspace documents.
 ---
 
 ## Procedure
@@ -12,3 +11,5 @@ description: >-
 5. Use documents-export for a requested output format. Check the returned revision, size, and truncation metadata before describing the export as complete.
 
 Treat IDs and cursors as opaque. Do not invent source text, metadata, recipients, or successful results. Each tool may report service unavailability; explain that plainly and stop the affected operation rather than claiming it succeeded.
+
+Use this skill for document records and text; route spreadsheet cells, slides, project status, and knowledge entries to their matching skills.

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search files and folders the connected account can access using name text, MIME type, parent folder, ownership, and modified-time filters. Use this to locate a document or folder before opening or moving it. Results contain stable item IDs, names, item type, MIME type, parent IDs, modified time, owner, and a web-view link when available; file bytes are not included. A text query may match names or indexed content depending on provider support, while structured fields constrain results. Sort by relevance or modification time and use the page cursor to continue through a large result set. If a file is not found, broaden the query or search the parent folder before concluding it is unavailable. Searching is read-only and does not create, rename, move, or share items.",
   inputSchema: z.object({
@@ -56,3 +57,9 @@ export default defineTool({
     return serviceUnavailable("files", "search_items");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("files")
+    ? { "files-search_items": registeredTool }
+    : null,
+);

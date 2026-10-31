@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Compare one or more named analytics metrics across two explicit date windows. Choose this for questions such as whether a conversion rate or active-user count changed between comparable periods. Supply the same timezone-aware date format for both windows; the service aligns the metric definitions and reports absolute and percentage deltas where they are meaningful. A zero or missing baseline may make a percentage unavailable, which is represented as null rather than a fabricated value. Optional segmentation produces separate comparisons for each requested dimension and can multiply the number of returned rows. Keep the metric list small and the segment list narrow for readable results. If the windows differ in length, the response includes their durations so comparisons are not mistaken for like-for-like periods.",
   inputSchema: z.object({
@@ -47,3 +48,9 @@ export default defineTool({
     return serviceUnavailable("analytics service", "compare periods");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("analytics")
+    ? { "analytics-compare_periods": registeredTool }
+    : null,
+);

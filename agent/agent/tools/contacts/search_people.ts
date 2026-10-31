@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search the address book for people matching names, email addresses, organizations, phone numbers, or tags. Use this when the user needs to find an existing contact or distinguish between similar entries before viewing or editing one. Results are concise person summaries containing stable contact IDs, display names, primary email, organization, and available match context; they do not include every private note or field by default. Text matching may be partial, while structured filters narrow the candidate set. Results are sorted by relevance unless a sort option is selected and are limited to one page. Continue with the returned cursor if the requested match is not present, then use contacts-get_person to inspect a candidate. Searching does not create contacts, update recency fields, or change group membership.",
   inputSchema: z.object({
@@ -52,3 +53,9 @@ export default defineTool({
     return serviceUnavailable("contacts", "search_people");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("contacts")
+    ? { "contacts-search_people": registeredTool }
+    : null,
+);

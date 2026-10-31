@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill when the user asks to find a workspace project, inspect its record or activity, create a project, revise descriptive fields, or change lifecycle status. Triggers include locating an initiative, checking its current owner group or labels, reviewing recent events, setting a requested project state, or recording a project scope statement. Route discovery to projects-search, record inspection to projects-get, timeline questions to projects-list_activity, new project requests to projects-create, descriptive edits to projects-update, and status transitions to projects-set_status. Use stable project IDs for all operations after discovery. This skill covers project records and lifecycle only; use domain-specific tools to read or edit linked documents, sheets, decks, or knowledge entries.
+description: Use to find, inspect, create, update, or change the status of workspace project records.
 ---
 
 ## Procedure
@@ -12,3 +11,5 @@ description: >-
 5. For a lifecycle request, use projects-set_status with the requested status and current revision. If rejected, inspect the new state and resolve the mismatch; do not choose another status on the user's behalf.
 
 Treat project IDs and cursors as opaque. Do not infer ownership, dates, or state transitions from a project name. If a tool reports service unavailability, report the operation as incomplete and do not state that the record changed.
+
+This skill covers project records and lifecycle; use domain-specific skills for linked documents, spreadsheets, presentations, or knowledge entries.

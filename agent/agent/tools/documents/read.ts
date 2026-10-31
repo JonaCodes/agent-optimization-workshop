@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Read text from one document identified by its stable document ID. Choose a revision when the user asks about a historical version; otherwise the service resolves the current revision. A section heading can narrow the response to a known part of the document, while offset and maxChars let you inspect long material in bounded chunks. The result contains the resolved document ID, title, revision metadata, requested section when found, returned text, and a continuation offset when more text remains. Keep the returned offset for the next call and do not assume a missing continuation means the text was empty. This operation is read-only. Use documents-search to discover IDs and documents-export when the user asks for a downloadable rendering or alternate file format.",
   inputSchema: z.object({
     documentId: z.string().min(1).describe('Stable ID of a document already identified by the user or documents-search.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("documents", "read");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("documents")
+    ? { "documents-read": registeredTool }
+    : null,
+);

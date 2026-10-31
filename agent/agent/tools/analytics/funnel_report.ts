@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Calculate progression through an ordered sequence of product events and report drop-off between steps. Use this when the question concerns a journey, onboarding flow, or conversion path with a known order. Each step is an event key and may include a property filter; the analysis follows users within the selected attribution window and reports entrants, step conversions, and step-to-step loss. The first step anchors the cohort, so changing it changes every downstream rate. Optional breakdowns create independent funnels by dimension and can make results sparse. The returned definition echoes the steps, date window, attribution rule, and breakdowns so the result can be checked before drawing conclusions. If a step has no matching events, inspect its exact event key and filters before widening the window.",
   inputSchema: z.object({
@@ -72,3 +73,9 @@ export default defineTool({
     return serviceUnavailable("analytics service", "build funnel report");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("analytics")
+    ? { "analytics-funnel_report": registeredTool }
+    : null,
+);

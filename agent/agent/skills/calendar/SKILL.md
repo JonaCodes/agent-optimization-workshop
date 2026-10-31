@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill for requests to find, inspect, schedule, edit, or RSVP to calendar events and to identify available calendars. It applies to date ranges, meeting titles, attendee or organizer references, event details, recurring occurrences, time zones, and invitation responses. Keep date interpretation explicit when local time matters, distinguish one occurrence from a recurring series, and use current event identifiers from search results for follow-up actions. Continue paginated searches before treating an interval as fully reviewed.
+description: Use to find, inspect, create, update, or RSVP to calendar events and identify calendars.
 ---
 
 # Calendar operations

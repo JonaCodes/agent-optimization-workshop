@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Update selected content or presentation metadata on one existing slide. Identify the deck and one-based slide number, then supply only the properties that should change. Omitted title, body blocks, notes, and layout remain untouched; explicit empty notes can clear notes when supported. Include expectedRevision when available so the service can detect concurrent edits. The result reports the slide ID, saved revision, and accepted fields. If the revision is stale, reread that slide and reconcile the user's requested change before retrying. This operation changes a deck; do not replace content merely to improve style unless the user asked for editing. Use presentations-read_slides to inspect, presentations-add_slide to add content, and presentations-reorder_slides to move a slide.",
   inputSchema: z.object({
     presentationId: z.string().min(1).describe('Stable ID of the presentation to edit.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("presentations", "update_slide");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("presentations")
+    ? { "presentations-update_slide": registeredTool }
+    : null,
+);

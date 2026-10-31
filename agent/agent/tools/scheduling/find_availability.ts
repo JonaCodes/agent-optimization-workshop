@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Find open time slots across one or more connected calendars within a requested date window. Use this when arranging a meeting and a set of participants or calendars is known. The response returns candidate start and end times with the timezone used, plus an indication of which requested calendars are free. Working hours, meeting duration, and preferred days narrow the search; when omitted, the provider uses its calendar defaults. Slot boundaries respect existing event buffers only when the connected calendar exposes them. Results are suggestions and do not place a hold or create an event. A cursor can continue a long availability search. If no slot is available, broaden the range or remove a preference rather than shortening the requested meeting without direction.",
   inputSchema: z.object({
@@ -68,3 +69,9 @@ export default defineTool({
     return serviceUnavailable("scheduling service", "find availability");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("scheduling")
+    ? { "scheduling-find_availability": registeredTool }
+    : null,
+);

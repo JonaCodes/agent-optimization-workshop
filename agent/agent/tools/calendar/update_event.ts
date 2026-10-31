@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Update selected fields on an existing event while preserving fields that are not supplied. Identify the event by its stable ID and use a fresh search if the reference is uncertain. Supported changes include title, start and end, location, description, attendee list, and visibility. Include explicit offsets in timestamps when local time matters. Supplying attendees replaces the existing attendee collection rather than appending to it, so retrieve the event first when additions or removals need to be calculated. The response should show the resulting event summary and whether invitations or updates were sent. Recurrence edits may affect one occurrence or an entire series depending on the scope value. This operation changes shared calendar data; invoke it only for a requested modification and check the returned result before making a second update.",
   inputSchema: z.object({
@@ -54,3 +55,9 @@ export default defineTool({
     return serviceUnavailable("calendar", "update_event");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("calendar")
+    ? { "calendar-update_event": registeredTool }
+    : null,
+);

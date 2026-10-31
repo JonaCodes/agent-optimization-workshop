@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Add one slide at a chosen position in an existing presentation. Supply a title and content blocks as text, optionally select a supported layout, and specify a one-based insertion point; omit the position to append at the end. Speaker notes are optional and should contain only material the user supplied or requested. The result identifies the new slide number and ID, applied layout, and new deck revision. Keep text blocks in intended reading order and avoid packing unrelated topics onto one slide. This operation changes the presentation. If placement depends on nearby content, inspect those slides first with presentations-read_slides. Use presentations-update_slide to revise an existing slide and presentations-reorder_slides to change sequence without altering slide content.",
   inputSchema: z.object({
     presentationId: z.string().min(1).describe('Stable ID of the existing presentation.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("presentations", "add_slide");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("presentations")
+    ? { "presentations-add_slide": registeredTool }
+    : null,
+);

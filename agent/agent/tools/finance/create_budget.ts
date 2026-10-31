@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Create a spending budget for a category and recurring period in a connected finance workspace. Use this when the requested limit, category, currency, and start period are sufficiently specified. The budget tracks categorized spending against the supplied amount; it does not transfer money or restrict purchases. The provider may return a budget identifier, tracking period, and initial spent amount, which can differ from zero if the period is already underway. Category keys and account scope must match values accepted by the provider. Recurrence controls the period length rather than an automatic renewal payment. If a budget already exists for the same category and period, the provider may reject the duplicate or return the existing definition; inspect that response before trying a different period.",
   inputSchema: z.object({
@@ -51,3 +52,9 @@ export default defineTool({
     return serviceUnavailable("finance service", "create budget");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("finance")
+    ? { "finance-create_budget": registeredTool }
+    : null,
+);

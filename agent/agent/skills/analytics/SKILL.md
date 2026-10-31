@@ -1,16 +1,10 @@
 ---
-description: >-
-  Use for questions about product usage, event counts, conversion, cohorts, metric
-  definitions, or analytics reports. Trigger when someone asks what changed over
-  time, where a journey loses users, how a defined audience behaves, or how a
-  report should be exported. This skill applies when the requested evidence lives
-  in the connected analytics workspace. It routes raw event questions, saved
-  metric questions, funnel analysis, and report delivery to the matching analytics
-  operation, while keeping the selected date window and metric definition visible
-  in the result.
+description: Use for analytics questions about product usage, events, conversion, cohorts, metrics, or reports.
 ---
 
 # Analytics
+
+Use this skill for evidence in the connected analytics workspace.
 
 1. Identify the question, target event or metric, date window, and any requested breakdown. Keep the analysis scoped to the smallest useful set of metrics and dimensions.
 2. If a metric’s meaning is unclear, call `analytics-get_metric_definition` using its key or a short search phrase. Use the returned canonical key and definition when describing later results.

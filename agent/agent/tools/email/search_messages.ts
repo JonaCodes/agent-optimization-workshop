@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search the mailbox for messages using words, sender or recipient addresses, subject text, labels, folders, and date bounds. Use this when the user wants to locate existing correspondence or needs candidate messages before opening one; it returns message summaries with identifiers, thread identifiers, dates, participants, subject lines, labels, and snippets. Query terms use the provider's ordinary search syntax when available, while separate filters remain explicit and combine as constraints. Results are ordered by the requested sort mode and are bounded by page size; use the returned cursor to continue without repeating earlier results. An empty result is a valid search outcome, so refine terms or widen dates before assuming a message is absent. This operation only searches and does not mark messages read, move them, or change labels.",
   inputSchema: z.object({
@@ -64,3 +65,9 @@ export default defineTool({
     return serviceUnavailable("email", "search_messages");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("email")
+    ? { "email-search_messages": registeredTool }
+    : null,
+);

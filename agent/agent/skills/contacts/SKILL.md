@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill to find, inspect, create, or update people and address-book groups. It applies when a user refers to a contact by name, email, phone, organization, tags, or group, and when contact fields need to be reviewed or maintained. Search before creating when a record may already exist, use stable IDs from current results, and retrieve details before making partial changes to collections such as emails or phone numbers. Group membership listings are paginated and should be completed when a full membership list is requested.
+description: Use to search, inspect, create, or update people and address-book groups.
 ---
 
 # Contact operations

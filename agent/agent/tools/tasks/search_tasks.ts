@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Search task records by words, status, due-date range, assignee, project, or label. Use this to locate an existing task before opening or changing it, or to prepare a focused list for the user. Results contain task IDs, titles, status, due date, priority, project, assignee, and a short description excerpt. Free text may search both titles and descriptions, while structured filters narrow the result set. Sort options support due date, recent update, or priority, and results are paginated to a bounded page size. Continue with the returned cursor to ensure a complete list before reporting there are no matches. Search does not change task status, assignment, due dates, or project membership.",
   inputSchema: z.object({
@@ -54,3 +55,9 @@ export default defineTool({
     return serviceUnavailable("tasks", "search_tasks");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("tasks")
+    ? { "tasks-search_tasks": registeredTool }
+    : null,
+);

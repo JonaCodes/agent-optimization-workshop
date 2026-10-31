@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "List the immediate children of a folder, returning one metadata summary per file or subfolder. Use this when the user names a folder or needs an inventory of its contents; for broad discovery across nested folders, use files-search_items instead. Each row includes an item ID, name, type, MIME type, size when applicable, modified time, and owner. Results can be filtered by item type or name prefix, then sorted by name or most recent modification. Pagination is bounded by the requested page size and the returned cursor must be used to retrieve later children. This listing is not recursive unless a depth option is supported by the service and explicitly requested. Listing does not download file contents or update the folder. Confirm you have all pages before reporting a complete inventory.",
   inputSchema: z.object({
@@ -53,3 +54,9 @@ export default defineTool({
     return serviceUnavailable("files", "list_folder");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("files")
+    ? { "files-list_folder": registeredTool }
+    : null,
+);

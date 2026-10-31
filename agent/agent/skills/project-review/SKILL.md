@@ -1,9 +1,10 @@
 ---
-description: >-
-  Use this skill when the user asks to review a workspace project record, status, activity, labels, ownership, or linked project material. Triggers include checking current state, summarizing recent project events, comparing a project record with its documents or workbook, preparing a review from project sources, or applying a clearly requested status or metadata change. Use projects-search and projects-get to establish project identity and current state, projects-list_activity for timeline evidence, and the relevant documents, spreadsheets, presentations, or knowledge tools for linked content. Use projects-update or projects-set_status only when the user explicitly requests a change. This skill provides a bounded workspace review and does not infer project health from names alone.
+description: Use to review a workspace project's record, activity, or linked project material.
 ---
 
 ## Procedure
+
+Load `projects` with `eve__skill` before using project tools. For linked sources, load the matching `documents`, `spreadsheets`, `presentations`, or `knowledge` skill before using that domain's tools.
 
 1. Find the project with projects-search and confirm its stable ID. Retrieve the current record with projects-get, including status, labels, ownership, and linked-resource counts when relevant.
 2. Read activity with projects-list_activity over the requested period. Follow pagination as needed and distinguish event summaries from the current project record.

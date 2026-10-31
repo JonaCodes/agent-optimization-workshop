@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Render a spreadsheet into a portable file format for delivery or inspection. Choose whether the export covers the full workbook or one known tab, and select a format such as PDF, CSV, XLSX, or HTML. PDF exports can include a page orientation and gridline preference; CSV and HTML preserve a single tab selection when provided. The response reports the exported scope, format, file size, and a retrieval reference when supported, along with any truncation or conversion warnings. Exports are read-only and do not alter workbook values or styling. For large workbooks, exporting one tab can avoid size limits. Use spreadsheets-read_range for a small data question, spreadsheets-format_range for presentation changes, and spreadsheets-write_range only when the user asks to alter cells.",
   inputSchema: z.object({
     spreadsheetId: z.string().min(1).describe('Stable ID of the workbook to render.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("spreadsheets", "export");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("spreadsheets")
+    ? { "spreadsheets-export": registeredTool }
+    : null,
+);

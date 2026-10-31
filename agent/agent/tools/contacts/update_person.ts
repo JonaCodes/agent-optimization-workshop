@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Update selected fields on an existing address-book contact while retaining fields that are not supplied. Use a person ID from a recent search or detail lookup so the intended record is clear. Supported fields include names, email and phone collections, organization, job title, and notes. For collection fields, the supplied array replaces the current collection as a whole; retrieve the person first if the requested change is only to add or remove one value. An empty array clears that collection when the provider permits it, while omitted fields remain untouched. The result returns the stable ID and normalized fields that were accepted. If a contact has changed concurrently or access is limited, resolve the reported conflict using a fresh detail read before retrying.",
   inputSchema: z.object({
@@ -74,3 +75,9 @@ export default defineTool({
     return serviceUnavailable("contacts", "update_person");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("contacts")
+    ? { "contacts-update_person": registeredTool }
+    : null,
+);

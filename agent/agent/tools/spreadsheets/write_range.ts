@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Write a rectangular matrix of cell values to a specified tab and A1-style range. Supply rows in row-major order and use null cells only when the chosen write mode explicitly permits clearing. The service validates that the matrix fits the target range and returns the resolved range, number of written cells, and resulting revision. Use raw values for dates, booleans, and numbers; choose formula input only when the user supplied or requested formulas. An optional expected revision supports conflict detection, and a mismatch should lead to rereading the target cells before deciding what to write. This operation changes workbook content. Keep the range narrow and preserve surrounding values. Use spreadsheets-read_range to inspect current cells first; use spreadsheets-format_range for display styling rather than embedding formatting in cell values.",
   inputSchema: z.object({
     spreadsheetId: z.string().min(1).describe('Stable ID of the workbook to modify.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("spreadsheets", "write_range");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("spreadsheets")
+    ? { "spreadsheets-write_range": registeredTool }
+    : null,
+);

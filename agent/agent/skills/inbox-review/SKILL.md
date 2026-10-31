@@ -1,9 +1,10 @@
 ---
-description: >-
-  Use this skill when the user asks to review an inbox, scan recent conversations, find unread or time-bounded email, summarize messages, or identify follow-up work. It applies to mailbox overviews, sender and subject filters, message details, draft replies, and explicit send requests. Review thread summaries first for triage, open individual messages when exact content matters, and continue pagination before describing a whole inbox segment. Keep follow-up creation separate from email handling and use task tools only when the user asks to record an action.
+description: Use to review an inbox, summarize messages, or record follow-up work explicitly requested by the user.
 ---
 
 # Inbox review
+
+Load `email` with `eve__skill` before using email tools. Load `tasks` only when the user asks to record follow-up work, before using task tools.
 
 Start with `email-list_threads` for a recent or unread overview. Apply a folder or label filter when the user specifies a mailbox section, and follow the cursor through the requested date range. Use `email-search_messages` when the user gives a sender, subject, phrase, or exact dates. A summary or snippet can guide triage, but open relevant messages with `email-get_message` when a summary depends on precise wording, headers, or attachment metadata.
 

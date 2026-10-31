@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "List transactions from connected accounts within an optional posting-date range. Use this to review recent activity, locate a merchant charge, or prepare a categorized summary. The response includes transaction identifiers, dates, merchant labels, amounts, currency, account labels, and provider categories when present. Amount sign follows the account’s provider convention, so inspect the transaction type before describing a charge or credit. Search terms match merchant and memo text; account and category filters are applied before pagination. Results are ordered newest first by default and use an opaque cursor for subsequent pages. The maximum page size is bounded to keep responses manageable. If a cursor is rejected, restart without it using a narrower date range or search term.",
   inputSchema: z.object({
@@ -59,3 +60,9 @@ export default defineTool({
     return serviceUnavailable("finance service", "list transactions");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("finance")
+    ? { "finance-list_transactions": registeredTool }
+    : null,
+);

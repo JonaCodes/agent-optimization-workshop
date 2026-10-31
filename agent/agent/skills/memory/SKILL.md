@@ -1,12 +1,5 @@
 ---
-description: >-
-  Use for retrieving, organizing, summarizing, saving, revising, or removing
-  durable workspace notes. Trigger when prior project decisions, technical facts,
-  or reusable procedures may answer the current request, or when the user asks to
-  preserve or correct such information. Focus records on project context and
-  operational knowledge, and avoid saving private personal details. Search by
-  meaning or exact wording, use collection names to narrow the scope, and retain
-  source references when they make a note easier to verify later.
+description: Use to retrieve, summarize, save, revise, or remove durable workspace notes.
 ---
 
 # Memory
@@ -19,3 +12,5 @@ description: >-
 6. When a note should no longer appear, inspect its exact identifier and call `memory-delete_note` with the intended archive or permanent-removal mode. This affects the note record only, not its referenced project file.
 
 Keep summaries and saved notes traceable to source material. If a search or digest does not include the needed detail, run a narrower search instead of treating an incomplete result as the full record.
+
+Do not save private personal details.

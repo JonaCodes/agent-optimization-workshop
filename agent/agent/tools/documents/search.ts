@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Search the connected document collection for material matching a phrase or a set of filters. Use a concise query for full-text matching and add folder, tag, owner group, or update-window constraints only when they help narrow the request. Archived material is excluded by default; set includeArchived when the user asks for historical or removed documents. The result is a relevance-ordered page of document summaries with stable document IDs, titles, locations, update timestamps, and short excerpts when available. Use limit to control page size and pass the returned nextCursor unchanged to continue; an absent cursor means the first page. Search does not open, change, or share documents. Call documents-read with a chosen ID when the user needs source text or a particular section.",
   inputSchema: z.object({
     query: z.string().min(1).describe('Words or a phrase to match in document titles and body text; use specific terms rather than a complete instruction.'),
@@ -18,3 +19,9 @@ export default defineTool({
     return serviceUnavailable("documents", "search");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("documents")
+    ? { "documents-search": registeredTool }
+    : null,
+);

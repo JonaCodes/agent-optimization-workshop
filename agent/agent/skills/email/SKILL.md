@@ -1,6 +1,5 @@
 ---
-description: >-
-  Use this skill for requests to find, inspect, draft, send, or reply to email messages and conversations. It applies when a user refers to a sender, recipient, subject, date range, message wording, mailbox folder, label, or existing thread. Choose the read operation that matches the level of detail requested, and distinguish a saved draft from a message that has been sent. It also covers locating a conversation before composing a response and reviewing paginated mailbox results without assuming the first page is complete.
+description: Use to find, inspect, draft, send, or reply to email messages and conversations.
 ---
 
 # Email operations

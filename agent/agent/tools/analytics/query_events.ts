@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Query event records for a named product event across an optional time window. Use this when a question concerns occurrences, properties, or trends at event level rather than a precomputed metric. The time bounds are interpreted in the analytics workspace timezone and are inclusive; omit either bound to use the provider’s available history. Filters are combined with AND, while values inside one filter remain a single exact match. Grouping returns one row per distinct group and may increase result volume. Results are capped by the requested limit, with a continuation cursor when more rows are available. Returned rows include the event name, count, selected dimensions, and the window applied. If a cursor expires, repeat the same query without it and narrow the date range or filters.",
   inputSchema: z.object({
@@ -68,3 +69,9 @@ export default defineTool({
     return serviceUnavailable("analytics service", "query events");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("analytics")
+    ? { "analytics-query_events": registeredTool }
+    : null,
+);

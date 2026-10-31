@@ -1,13 +1,5 @@
 ---
-description: >-
-  Use for requests about connected account balances, transaction history,
-  transaction categories, budgets, projected cash flow, or statement comparison.
-  Trigger when someone wants a factual view of activity in a linked finance
-  workspace or asks to update a bookkeeping category or budget definition. This
-  skill selects the smallest relevant account and date scope, keeps currencies
-  explicit, and distinguishes recorded transactions from projections. Use it for
-  read requests as well as clearly specified categorization and budget tasks; it
-  does not calculate values by guessing missing account data.
+description: Use for connected account balances, transactions, categories, budgets, cash-flow projections, or reconciliation.
 ---
 
 # Finance

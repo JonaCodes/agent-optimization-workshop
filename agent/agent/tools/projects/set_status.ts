@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Change the lifecycle status of a project after the user has clearly requested that transition. Identify the project by stable ID, choose a supported status, and include the current revision when available. Optional effective date and transition note can record timing and context supplied by the user. The service returns the prior and new statuses, saved revision, and any transition validation message. If a transition is rejected, retrieve the current project with projects-get and resolve the state mismatch before retrying; do not invent an alternate status. This operation changes lifecycle state. Use projects-update for names, descriptions, labels, or ownership, and projects-search when the project ID is not known.",
   inputSchema: z.object({
     projectId: z.string().min(1).describe('Stable ID of the project to transition.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("projects", "set_status");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("projects")
+    ? { "projects-set_status": registeredTool }
+    : null,
+);

@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Grant a person or group access to a file or folder, or create a link with a selected access level when the provider supports it. Identify the item by a current stable ID and specify either named recipients or link access. Named permission roles are viewer, commenter, or editor; link permissions may be broader and should only be selected when requested. Optional expiry and notification settings are passed to the provider where supported. The response should report the created permission ID, target, effective role, link scope, and any rejected recipients. Folder sharing can grant access to descendants through inheritance, so use a folder ID only when that scope is intended. If the item is unavailable or a grant fails, verify the item and current permissions before retrying; do not duplicate grants blindly.",
   inputSchema: z.object({
@@ -55,3 +56,9 @@ export default defineTool({
     return serviceUnavailable("files", "share_item");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("files")
+    ? { "files-share_item": registeredTool }
+    : null,
+);

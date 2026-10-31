@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Create a new spreadsheet with a title and one or more named tabs. Optionally seed the first tab with a rectangular matrix of user-provided values and select a locale for default date, number, and formula conventions. The result contains the new workbook ID, title, tab IDs and names, revision, and the created dimensions. If seedRows is omitted, tabs begin empty; when provided, each row should have a consistent number of cells. A tab title must be unique within the new workbook, so choose distinct names before calling. This operation creates a new workbook and does not replace a matching title. Use spreadsheets-search first when the user may be referring to an existing sheet, spreadsheets-write_range to populate more cells, and spreadsheets-format_range to style them.",
   inputSchema: z.object({
     title: z.string().min(1).max(240).describe('Workbook title, preserving the user’s requested wording.'),
@@ -17,3 +18,9 @@ export default defineTool({
     return serviceUnavailable("spreadsheets", "create");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("spreadsheets")
+    ? { "spreadsheets-create": registeredTool }
+    : null,
+);

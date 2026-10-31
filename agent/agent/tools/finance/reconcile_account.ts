@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description:
     "Compare a connected account’s provider balance with a supplied statement balance for a specific statement date. Use this to identify an account-level reconciliation difference and list unreconciled activity when the provider supports it. The comparison is performed in the account currency and does not move funds, edit transactions, or mark individual entries as cleared. The result reports both balances, the difference using provider sign conventions, the statement date, and any candidate unmatched transaction identifiers. If a date is outside the provider’s transaction history, the tool may return a partial reconciliation with that limitation. Check that the account and statement date are correct before interpreting a difference; a small unmatched item list can help focus a subsequent transaction search.",
   inputSchema: z.object({
@@ -48,3 +49,9 @@ export default defineTool({
     return serviceUnavailable("finance service", "reconcile account");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("finance")
+    ? { "finance-reconcile_account": registeredTool }
+    : null,
+);

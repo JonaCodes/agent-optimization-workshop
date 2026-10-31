@@ -1,8 +1,9 @@
-import { defineTool } from "eve/tools";
+import { defineDynamic, defineTool } from "eve/tools";
+import { isSkillLoaded } from "../../lib/skill-activation.js";
 import { z } from "zod";
 import { serviceUnavailable } from "../../lib/service-unavailable.js";
 
-export default defineTool({
+const registeredTool = defineTool({
   description: "Update descriptive project fields while preserving every field omitted from the request. Identify the project by stable ID and include expectedRevision when available to avoid overwriting concurrent changes. Supply one or more of name, description, labels, owner group, parent project, or target date. An empty labels array clears labels; omit labels to leave them unchanged. The result reports the accepted changes and current revision. If a stale revision is rejected, retrieve the latest project using projects-get and apply only the requested changes to the current record. This operation does not set lifecycle status; use projects-set_status for that state change. Use projects-search to resolve names to IDs and avoid treating a similarly named project as the intended target.",
   inputSchema: z.object({
     projectId: z.string().min(1).describe('Stable ID of the existing project to edit.'),
@@ -19,3 +20,9 @@ export default defineTool({
     return serviceUnavailable("projects", "update");
   },
 });
+
+export default defineDynamic(() =>
+  isSkillLoaded("projects")
+    ? { "projects-update": registeredTool }
+    : null,
+);
