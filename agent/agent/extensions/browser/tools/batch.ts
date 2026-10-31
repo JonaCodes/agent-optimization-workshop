@@ -1,6 +1,9 @@
 import browserExtension from "@agent-browser/eve";
 import { defaultSessionName } from "@agent-browser/sandbox";
-import { AgentBrowserCommandError, runAgentBrowser } from "@agent-browser/eve/sandbox";
+import {
+  AgentBrowserCommandError,
+  runAgentBrowser,
+} from "@agent-browser/eve/sandbox";
 import { browserBatchResponse } from "../../../lib/browser-batch-response.js";
 import { defineDynamic, defineTool } from "eve/tools";
 import { z } from "zod";
@@ -65,6 +68,10 @@ export const browserBatchActionSchema = z.discriminatedUnion("action", [
     action: z.literal("click"),
     selector,
   }),
+  z.strictObject({
+    action: z.literal("scroll_into_view"),
+    selector,
+  }),
   waitAction,
 ]);
 
@@ -97,6 +104,8 @@ function actionToCommand(action: BrowserBatchAction): string[] {
       return [action.checked ? "check" : "uncheck", action.selector];
     case "click":
       return ["click", action.selector];
+    case "scroll_into_view":
+      return ["scrollintoview", action.selector];
     case "wait":
       return ["wait", String(action.seconds * 1000)];
   }
@@ -104,7 +113,7 @@ function actionToCommand(action: BrowserBatchAction): string[] {
 
 export const browserBatch = defineTool({
   description:
-    "Run ordered browser actions in one Agent Browser session. After discovery, combine fills, uploads, key presses, selections, checks, ordinary clicks, and fixed waits without another model turn. For a fixed settling delay, omit wait seconds for the default five seconds and set seconds only when the user explicitly requests another duration. Stops on the first failure. Keep discovery, final verification, and consequential final actions outside the batch.",
+    "Run ordered browser actions in one Agent Browser session. After discovery, combine fills, uploads, key presses, selections, checks, clicks, scrolling elements into view, and fixed waits without another model turn. For a fixed settling delay, omit wait seconds for the default five seconds and set seconds only when the user explicitly requests another duration. Stops on the first failure. Keep discovery, final verification, and consequential final actions outside the batch.",
   inputSchema: browserBatchSchema,
   label: {
     start: () => "Using browser",
