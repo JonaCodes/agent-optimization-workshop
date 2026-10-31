@@ -1,0 +1,34 @@
+{
+  "name": "agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "init-setup": "node scripts/setup.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "build": "eve build",
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test scripts/test/*.test.mjs ../shopping-site/test/*.test.mjs",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@agent-browser/eve": "0.41.0",
+    "@puppeteer/browsers": "3.2.6",
+    "agent-browser": "0.41.0",
+    "ai": "7.0.148",
+    "eve": "0.88.0",
+    "just-bash": "3.6.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "agent-browser@0.41.0": true,
+    "@mongodb-js/zstd@7.0.0": true
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

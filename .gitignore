@@ -1,0 +1,20 @@
+# Facilitator-only workshop notes and answer material
+/.facilitator/
+/docs/
+/handoffs/
+
+# Local dependencies and generated output
+/node_modules/
+/.eve/
+/.output/
+/agent/node_modules/
+/agent/.eve/
+/agent/.output/
+/agent/.browsers/
+
+# Local credentials and editor/OS files
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store

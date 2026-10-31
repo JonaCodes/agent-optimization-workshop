@@ -1,0 +1,146 @@
+.cart-page .page-intro {
+  margin-bottom: 30px;
+}
+
+.cart-content {
+  padding: 22px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.cart-headings,
+.cart-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px 100px 100px;
+  align-items: center;
+  gap: 14px;
+}
+
+.cart-headings {
+  padding-bottom: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cart-row {
+  min-height: 74px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.cart-item-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cart-item-visual {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+}
+
+.cart-product-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  background: #f2f3ea;
+  font-size: 24px;
+}
+
+.cart-remove {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.cart-remove:hover {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.cart-product {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cart-product strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.cart-product span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cart-quantity,
+.cart-unit,
+.cart-line-total {
+  text-align: right;
+}
+
+.cart-line-total {
+  font-size: 13px;
+}
+
+.cart-grand-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ink);
+  font-size: 15px;
+}
+
+.cart-grand-total strong {
+  font-size: 19px;
+}
+
+.empty-cart {
+  display: grid;
+  min-height: 220px;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.empty-cart p {
+  margin: 0;
+}
+
+.empty-cart a {
+  color: var(--green-dark);
+  font-weight: 650;
+}
+
+.empty-cart-mark {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 23px;
+}

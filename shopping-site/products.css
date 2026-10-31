@@ -1,0 +1,146 @@
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.product-card {
+  position: relative;
+  display: flex;
+  min-height: 286px;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.product-card:hover {
+  border-color: #c3d2c3;
+  box-shadow: 0 8px 24px rgb(34 67 45 / 7%);
+}
+
+.product-card[aria-busy="true"] {
+  border-color: #a8c5a9;
+}
+
+.product-art {
+  position: relative;
+  display: grid;
+  height: 96px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #f2f3ea;
+}
+
+.product-icon {
+  font-size: 43px;
+}
+
+.product-copy {
+  flex: 1;
+  padding: 14px 1px 5px;
+}
+
+.product-copy h3 {
+  min-height: 38px;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.product-amount,
+.product-availability {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.product-price {
+  margin: 10px 0 4px;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.product-availability {
+  font-size: 11px;
+}
+
+.quantity-control {
+  position: absolute;
+  inset: 50% 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.quantity-control button {
+  display: grid;
+  width: 34px;
+  height: 42px;
+  place-items: center;
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--green-dark);
+  cursor: pointer;
+  font-size: 35px;
+  line-height: 1;
+  text-shadow:
+    0 1px 5px var(--paper),
+    0 0 8px var(--paper);
+  pointer-events: auto;
+}
+
+.quantity-control button:hover {
+  color: var(--green);
+}
+
+.quantity-down {
+  grid-column: 1;
+}
+
+.quantity-up {
+  grid-column: 3;
+}
+
+.quantity-control button:disabled {
+  cursor: default;
+}
+
+.quantity-value {
+  grid-column: 2;
+  min-width: 28px;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 650;
+  text-align: center;
+  text-shadow:
+    0 1px 5px var(--paper),
+    0 0 8px var(--paper);
+}
+
+.availability-note {
+  margin: 0;
+  padding: 10px 4px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.mutation-feedback {
+  min-height: 16px;
+  margin: 5px 0 -4px;
+  color: var(--green-dark);
+  font-size: 10px;
+  text-align: center;
+}
