@@ -1,0 +1,22 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node --input-type=commonjs -e \"try{const c=require('node:child_process');const p=require('node:path');const root=c.execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim();const r=c.spawnSync(process.execPath,[p.join(root,'.workshop/hooks/guard.mjs')],{stdio:'inherit'});process.exit(r.status===0?0:2)}catch{console.error('Workshop guardrail could not start.');process.exit(2)}\"",
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Read(.git/**)",
+      "Read(.facilitator/**)"
+    ]
+  }
+}
