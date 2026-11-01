@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@agent-browser/eve": "0.41.0",
+    "@ai-sdk/azure": "4.0.114",
     "@puppeteer/browsers": "3.2.6",
     "agent-browser": "0.41.0",
     "ai": "7.0.148",

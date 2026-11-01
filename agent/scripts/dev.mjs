@@ -13,6 +13,8 @@ import {
 } from "./runtime.mjs";
 import { checkBrowser } from "./browser-check.mjs";
 import { browserEnvironment } from "./browser.mjs";
+import { loadLocalEnvironment } from "../local-settings.mjs";
+import { readModelConfig, printModelGuidance } from "../model-config.mjs";
 
 const storeUrl = "http://127.0.0.1:4173";
 let storeProcess;
@@ -32,8 +34,13 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 await reportFailure(async () => {
   await checkRuntime();
   await checkDependencies();
-  await checkLoginPrerequisites();
+  await loadLocalEnvironment();
+  const modelConfig = readModelConfig();
+  // Keep Eve's selected provider consistent with this launcher's checks.
+  process.env.WORKSHOP_PROVIDER = modelConfig.provider;
+  await checkLoginPrerequisites(modelConfig.provider);
   await checkBrowser();
+  printModelGuidance(modelConfig);
 
   try {
     if (!(await storeIsReady())) {

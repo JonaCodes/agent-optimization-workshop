@@ -1,8 +1,8 @@
 import { defineAgent } from "eve";
-import { chatgpt } from "eve/models/openai";
+import { readModelConfig } from "../model-config.mjs";
+import { createModelSelection } from "../model.mjs";
 
 export default defineAgent({
   build: { externalDependencies: ["agent-browser"] },
-  model: chatgpt("gpt-6-luna-fast"),
-  reasoning: "high",
+  ...createModelSelection(readModelConfig()),
 });

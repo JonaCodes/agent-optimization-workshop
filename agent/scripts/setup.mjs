@@ -7,9 +7,13 @@ import {
 } from "./runtime.mjs";
 import { resolve } from "node:path";
 import { checkBrowser } from "./browser-check.mjs";
+import { printModelGuidance } from "../model-config.mjs";
+
+import { configureSetup } from "./setup-prompt.mjs";
 
 await reportFailure(async () => {
   await checkRuntime();
+  printModelGuidance(await configureSetup());
   if (!process.env.npm_execpath) {
     throw new Error(
       "Run setup from the repository root: npm --prefix agent run init-setup",

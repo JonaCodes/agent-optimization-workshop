@@ -61,8 +61,8 @@ export async function checkDependencies(root = agentRoot) {
   }
 }
 
-export async function checkLoginPrerequisites() {
-  if (process.platform !== "linux") return;
+export async function checkLoginPrerequisites(provider = "chatgpt") {
+  if (provider !== "chatgpt" || process.platform !== "linux") return;
   try {
     await access("/usr/bin/secret-tool", constants.X_OK);
   } catch {
