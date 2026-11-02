@@ -88,7 +88,7 @@ test("update permits blank key to retain it without displaying its value", async
   const root = await fixture(t);
   await saveSettings(azure, root);
   const prompts = [];
-  await configureSetup({ root, environment: {}, ask: answers(["", "update", "", "new-deployment", "", "", ""], prompts), log() {} });
+  await configureSetup({ root, environment: {}, ask: answers(["", "update", "", "new-deployment", "", ""], prompts), log() {} });
   const saved = await readSavedSettings(root);
   assert.equal(saved.AZURE_OPENAI_DEPLOYMENT, "new-deployment");
   assert.equal(saved.AZURE_API_KEY, azure.AZURE_API_KEY);
@@ -168,35 +168,56 @@ test("invalid organizer defaults prompt for correction instead of being silently
     ...defaults,
     AZURE_OPENAI_ENDPOINT: "http://invalid",
     AZURE_OPENAI_CONTEXT_WINDOW: "abc",
-    AZURE_OPENAI_API: "invalid",
   });
   const prompts = [], logs = [];
   const config = await configureSetup({ root, environment: {}, ask: answers([
     "azure", azure.AZURE_OPENAI_ENDPOINT, azure.AZURE_OPENAI_CONTEXT_WINDOW,
-    azure.AZURE_OPENAI_API, azure.AZURE_API_KEY,
+    azure.AZURE_API_KEY,
   ], prompts), log: (line) => logs.push(line) });
   assert.equal(config.provider, "azure");
-  assert.equal(prompts.length, 5);
+  assert.equal(prompts.length, 4);
   assert.equal(prompts[1].fallback, "");
   assert.match(logs.join(), /AZURE_OPENAI_ENDPOINT.*invalid/);
   assert.deepEqual(await readSavedSettings(root), azure);
 });
 
-test("typed endpoint, context, and API errors retry the same field before asking for the key", async (t) => {
+test("typed endpoint and context errors retry the same field before asking for the key", async (t) => {
   const root = await fixture(t);
   const prompts = [], logs = [];
   await configureSetup({ root, environment: {}, ask: answers([
     "azure", "http://invalid", azure.AZURE_OPENAI_ENDPOINT,
     azure.AZURE_OPENAI_DEPLOYMENT, "abc", azure.AZURE_OPENAI_CONTEXT_WINDOW,
-    "invalid", "chat", azure.AZURE_API_KEY,
+    azure.AZURE_API_KEY,
   ], prompts), log: (line) => logs.push(line) });
   assert.equal(prompts[1].label, prompts[2].label);
   assert.equal(prompts[4].label, prompts[5].label);
-  assert.equal(prompts[6].label, prompts[7].label);
   assert.equal(prompts.filter((prompt) => prompt.secret).length, 1);
   assert.match(logs.join(), /HTTPS/);
   assert.match(logs.join(), /positive integer/);
-  assert.match(logs.join(), /responses or chat/);
   assert.doesNotMatch(logs.join(), /fake-only-key/);
-  assert.equal((await readSavedSettings(root)).AZURE_OPENAI_API, "chat");
+  assert.equal((await readSavedSettings(root)).AZURE_OPENAI_API, "responses");
+});
+
+for (const api of ["responses", "chat"]) {
+  test(`Azure ${api} protocol is reused silently during updates`, async (t) => {
+    const root = await fixture(t);
+    await saveSettings({ ...azure, AZURE_OPENAI_API: api }, root);
+    const prompts = [];
+    const config = await configureSetup({ root, environment: {}, ask: answers(["", "update", "", "", "", ""], prompts), log() {} });
+    assert.equal(config.api, api);
+    assert.ok(prompts.every(({ label }) => !label.includes("responses / chat")));
+  });
+}
+test("invalid API override gives correction guidance without a protocol prompt or settings write", async (t) => {
+  const root = await fixture(t, azure);
+  const prompts = [];
+  await assert.rejects(configureSetup({ root, environment: { AZURE_OPENAI_API: "invalid" }, ask: answers(["azure"], prompts), log() {} }), /Set AZURE_OPENAI_API to responses or chat.*rerun setup/);
+  assert.equal(prompts.length, 1);
+  assert.deepEqual(await readSavedSettings(root), {});
+});
+test("fresh Azure setup defaults to responses without a protocol question", async (t) => {
+  const { WORKSHOP_PROVIDER, AZURE_API_KEY, AZURE_OPENAI_API, ...defaults } = azure;
+  const root = await fixture(t, defaults);
+  const config = await configureSetup({ root, environment: {}, ask: answers(["azure", AZURE_API_KEY]), log() {} });
+  assert.equal(config.api, "responses");
 });

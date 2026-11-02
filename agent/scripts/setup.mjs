@@ -1,19 +1,18 @@
 import {
-  agentRoot,
   checkDependencies,
   checkRuntime,
   reportFailure,
   runNode,
 } from "./runtime.mjs";
-import { resolve } from "node:path";
-import { checkBrowser } from "./browser-check.mjs";
+import { installAndCheckBrowser } from "./setup-browser.mjs";
 import { printModelGuidance } from "../model-config.mjs";
 
 import { configureSetup } from "./setup-prompt.mjs";
+import { verifySetupModel } from "./setup-model.mjs";
 
 await reportFailure(async () => {
   await checkRuntime();
-  printModelGuidance(await configureSetup());
+  const configured = await configureSetup();
   if (!process.env.npm_execpath) {
     throw new Error(
       "Run setup from the repository root: npm --prefix agent run init-setup",
@@ -33,14 +32,8 @@ await reportFailure(async () => {
     );
   }
   await checkDependencies();
-  console.log("Installing the automation browser (Linux may require sudo)…");
-  try {
-    await runNode(resolve(agentRoot, "scripts/install-browser.mjs"), []);
-  } catch (error) {
-    throw new Error(
-      `Browser installation failed. Check the error above, network access, and Linux sudo/system libraries, then rerun setup. ${error.message}`,
-    );
-  }
-  await checkBrowser();
+  const modelConfig = await verifySetupModel(configured);
+  await installAndCheckBrowser();
+  printModelGuidance(modelConfig);
   console.log("Setup complete. Run: npm --prefix agent run dev");
 });

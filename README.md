@@ -38,10 +38,12 @@ For Azure, follow the prompts and guide below.
 
 Node.js 24+ with npm, internet, and a ChatGPT subscription or Azure OpenAI deployment.
 macOS/Windows x64/arm64, or Ubuntu/Debian x64. Run commands from the repo root.
+Windows automatically falls back to installed Chrome if the managed browser fails.
 
 ## Azure
 
 Setup collects deployment details and a hidden API key, then saves them locally.
+It verifies access and tool calling with one model request; rejected keys can be re-entered.
 Rerun setup to update settings or switch providers. Use a tool-calling deployment.
 Optional nonsecret defaults: [`agent/workshop-defaults.json`](agent/workshop-defaults.json).
 
@@ -53,7 +55,7 @@ Check settings, dependencies, and browser launch:
 npm --prefix agent run doctor
 ```
 
-Optional Azure connection check (one model request):
+Recheck Azure access (one model request):
 
 ```sh
 npm --prefix agent run doctor -- --check-model

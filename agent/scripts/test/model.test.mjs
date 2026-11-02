@@ -255,3 +255,30 @@ test("setup guidance never prints the Azure key or endpoint", (t) => {
   assert.ok(messages.length > 0);
   assert.doesNotMatch(messages.join("\n"), /test-only-secret|workshop\.openai/);
 });
+
+for (const status of [403, 429]) {
+  test(`Azure HTTP ${status} failure exposes only safe status and performs one request`, async (t) => {
+    let calls = 0;
+    t.mock.method(globalThis, "fetch", async () => {
+      calls++;
+      return Response.json({ error: { message: "test-only-secret", code: "failure" } }, { status });
+    });
+    await assert.rejects(checkModelAccess(readModelConfig(azureEnvironment)), (error) => {
+      assert.equal(error.statusCode, status);
+      assert.match(error.message, new RegExp(`HTTP ${status}`));
+      assert.doesNotMatch(error.message, /test-only-secret/);
+      return true;
+    });
+    assert.equal(calls, 1);
+  });
+}
+test("Azure network errors are sanitized without retries", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => { calls++; throw new Error("test-only-secret"); });
+  await assert.rejects(checkModelAccess(readModelConfig(azureEnvironment)), (error) => {
+    assert.match(error.message, /network access/);
+    assert.doesNotMatch(error.message, /test-only-secret/);
+    return true;
+  });
+  assert.equal(calls, 1);
+});

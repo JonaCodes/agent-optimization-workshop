@@ -39,9 +39,11 @@ export async function checkModelAccess(config) {
     const status = Number.isInteger(error.statusCode)
       ? ` (HTTP ${error.statusCode})`
       : "";
-    throw new Error(
+    const failure = new Error(
       `Azure model check failed${status}. Check the key, endpoint, deployment, network access, and quota. The deployment must support tool calling with the selected AZURE_OPENAI_API (responses or chat).`,
     );
+    failure.statusCode = Number.isInteger(error.statusCode) ? error.statusCode : undefined;
+    throw failure;
   }
   if (!result.toolCalls.some((call) => call.toolName === "workshop_check")) {
     throw new Error(

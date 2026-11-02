@@ -12,7 +12,6 @@ import {
   reportFailure,
 } from "./runtime.mjs";
 import { checkBrowser } from "./browser-check.mjs";
-import { browserEnvironment } from "./browser.mjs";
 import { loadLocalEnvironment } from "../local-settings.mjs";
 import { readModelConfig, printModelGuidance } from "../model-config.mjs";
 
@@ -39,7 +38,7 @@ await reportFailure(async () => {
   // Keep Eve's selected provider consistent with this launcher's checks.
   process.env.WORKSHOP_PROVIDER = modelConfig.provider;
   await checkLoginPrerequisites(modelConfig.provider);
-  await checkBrowser();
+  const browserEnvironment = await checkBrowser();
   printModelGuidance(modelConfig);
 
   try {
@@ -67,7 +66,7 @@ await reportFailure(async () => {
         "tokens",
         ...process.argv.slice(2),
       ],
-      { cwd: agentRoot, stdio: "inherit", env: await browserEnvironment() },
+      { cwd: agentRoot, stdio: "inherit", env: browserEnvironment },
     );
 
     const [exitCode, signal] = await once(eveProcess, "exit");

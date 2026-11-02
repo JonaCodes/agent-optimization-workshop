@@ -19,7 +19,7 @@ export async function configureSetup({ root = settingsRoot, environment = proces
       const reuse = configured
         ? await choose(ask, "Saved Azure settings: keep or update?", "keep", ["keep", "update"])
         : "update";
-      for (const key of managedKeys.filter((key) => key.startsWith("AZURE_") && key !== "AZURE_API_KEY")) {
+      for (const key of managedKeys.filter((key) => key.startsWith("AZURE_") && key !== "AZURE_API_KEY" && key !== "AZURE_OPENAI_API")) {
         const value = effective[key] || defaults[key] || "";
         const valid = isValidSetting(key, value);
         if (value && !valid) log(`Check ${key}: its saved or workshop value is invalid.`);
@@ -27,6 +27,9 @@ export async function configureSetup({ root = settingsRoot, environment = proces
           ? value
           : await askSetting(ask, key, valid ? value : "", log);
       }
+      settings.AZURE_OPENAI_API = effective.AZURE_OPENAI_API || defaults.AZURE_OPENAI_API || "responses";
+      try { validateAzureSetting("AZURE_OPENAI_API", settings.AZURE_OPENAI_API); }
+      catch { throw new Error("Set AZURE_OPENAI_API to responses or chat in your shell, .env.development.local, saved settings, or workshop-defaults.json, then rerun setup."); }
       const existingKey = effective.AZURE_API_KEY;
       settings.AZURE_API_KEY = reuse === "keep"
         ? existingKey
@@ -39,7 +42,7 @@ export async function configureSetup({ root = settingsRoot, environment = proces
     const next = await loadLocalEnvironment({ ...environment }, root);
     const overridden = Object.keys(settings).filter((key) => next[key] !== settings[key]);
     if (overridden.length) log(`Saved settings are overridden by your shell or .env.development.local: ${overridden.join(", ")}. Remove those overrides to use setup settings.`);
-    log("Provider settings saved locally. No model request was sent.");
+    log("Provider settings saved locally.");
     return readModelConfig(next);
   } finally { prompt?.close(); }
 }
@@ -48,7 +51,6 @@ const labels = {
   AZURE_OPENAI_ENDPOINT: "Azure resource endpoint (ask organizer if unknown)",
   AZURE_OPENAI_DEPLOYMENT: "Azure deployment name (ask organizer if unknown)",
   AZURE_OPENAI_CONTEXT_WINDOW: "Azure context limit in tokens (ask organizer if unknown)",
-  AZURE_OPENAI_API: "Azure API (responses / chat)",
 };
 
 function hasAzureSettings(environment) {
