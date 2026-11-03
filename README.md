@@ -6,7 +6,7 @@ Your task is to send **exactly** this prompt to the provided agent:
 
 > add milk, two dozen eggs, oats, bread, 3 olive oil, and 500g beans to the cart
 
-And have the agent successfully add these items to your shopping cart.
+And have the agent successfully add these items to your shopping cart from th favorites section only.
 
 This agent is already set up with enough tooling to go to `http://127.0.0.1:4173/favorites` and do the work, but it does so at the cost of ~500K tokens.
 
